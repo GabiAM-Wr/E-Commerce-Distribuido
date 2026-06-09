@@ -1,0 +1,117 @@
+spring:
+  application:
+    name: e-commerce-distribuido
+
+  # MongoDB Replica Set
+  data:
+    mongodb:
+      uri: mongodb://mongodb-node1:27017,mongodb-node2:27017,mongodb-node3:27017/?replicaSet=rs0
+      auto-index-creation: true
+
+  # Cassandra Cluster
+  cassandra:
+    contact-points: cassandra-node1,cassandra-node2,cassandra-node3
+    port: 9042
+    local-datacenter: datacenter1
+    keyspace-name: ecommerce
+    compression: LZ4
+
+  # JPA/Hibernate para CockroachDB
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQL10Dialect
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQL10Dialect
+
+  datasource:
+    url: jdbc:postgresql://cockroachdb-node1:5432,cockroachdb-node2:5432,cockroachdb-node3:5432/ecommerce?sslmode=disable
+    username: root
+    password: ""
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 20
+
+server:
+  port: 8081
+  servlet:
+    context-path: /
+
+# Logging
+logging:
+  level:
+    root: INFO
+    com.example.E_Commerce: DEBUG
+    org.springframework.data: DEBUG
+
+# Configuración de Replicación
+replication:
+  enabled: true
+  sync-interval-ms: 1000
+  nodes:
+    - name: mongodb-node1
+      host: mongodb-node1
+      port: 27017
+      type: MONGODB
+    - name: mongodb-node2
+      host: 192.168.0.36
+      port: 27017
+      type: MONGODB
+    - name: mongodb-node3
+      host: 192.168.0.37
+      port: 27017
+      type: MONGODB
+    - name: cassandra-node1
+      host: cassandra-node1
+      port: 9042
+      type: CASSANDRA
+    - name: cassandra-node2
+      host: 192.168.0.36
+      port: 9042
+      type: CASSANDRA
+    - name: cassandra-node3
+      host: 192.168.0.37
+      port: 9042
+      type: CASSANDRA
+    - name: cockroachdb-node1
+      host: cockroachdb-node1
+      port: 5432
+      type: COCKROACHDB
+    - name: cockroachdb-node2
+      host: 192.168.0.36
+      port: 5432
+      type: COCKROACHDB
+    - name: cockroachdb-node3
+      host: 192.168.0.37
+      port: 5432
+      type: COCKROACHDB
+
+# Resilience4j
+resilience4j:
+  circuitbreaker:
+    instances:
+      mongodb:
+        registerHealthIndicator: true
+        slidingWindowSize: 10
+        minimumNumberOfCalls: 5
+        permittedNumberOfCallsInHalfOpenState: 3
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+        waitDurationInOpenState: 5000
+        failureRateThreshold: 50
+      cassandra:
+        registerHealthIndicator: true
+        slidingWindowSize: 10
+        minimumNumberOfCalls: 5
+        permittedNumberOfCallsInHalfOpenState: 3
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+        waitDurationInOpenState: 5000
+        failureRateThreshold: 50
+      cockroachdb:
+        registerHealthIndicator: true
+        slidingWindowSize: 10
+        minimumNumberOfCalls: 5
+        permittedNumberOfCallsInHalfOpenState: 3
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+        waitDurationInOpenState: 5000
+        failureRateThreshold: 50
